@@ -211,9 +211,9 @@ async function handleFileUpload(file, tipo) {
   
   try {
     const disciplinas = await processarArquivo(file, tipo, (progressData) => {
-      if (statusEl && loadingEl) {
-        const progressFill = loadingEl.querySelector(".progress-fill");
-        const phaseSpan = loadingEl.querySelector(".ocr-phase span:last-child");
+      if (statusEl) {
+        const progressFill = statusEl.querySelector(".progress-fill");
+        const phaseSpan = statusEl.querySelector(".ocr-phase span:last-child");
         
         if (progressFill) {
           progressFill.style.width = `${progressData.percent}%`;
@@ -238,14 +238,13 @@ async function handleFileUpload(file, tipo) {
     
     aplicarMatchingAoEstadoUI(matchingResults);
     
-    if (loadingEl) loadingEl.style.display = "none";
-    
     if (statusEl) {
       statusEl.className = "ocr-status success";
+      statusEl.style.display = "block";
       statusEl.innerHTML = `
-        <div style="font-weight:600;margin-bottom:4px;">Sucesso!</div>
+        <div style="font-weight:600;margin-bottom:4px;">✓ Sucesso!</div>
         <div>${disciplinas.length} disciplinas encontradas e processadas.</div>
-        <div style="font-size:12px;margin-top:4px;">Revise o matching e clique em "Aplicar ao Curso".</div>
+        <div style="font-size:12px;margin-top:4px;">Revise o matching abaixo e clique em "Aplicar ao Curso".</div>
       `;
     }
     
