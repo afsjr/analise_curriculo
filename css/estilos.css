@@ -237,6 +237,43 @@ main{max-width:1120px;margin:0 auto;padding:28px 24px 60px;}
 .mr-arrow{color:var(--green);}
 .mr-to{font-weight:600;color:var(--green);}
 
+/* ── RESUMO DA ANÁLISE ── */
+.resumo-analise{background:#fff;border:2px solid #e8e4de;border-radius:12px;padding:20px;margin:16px 0;}
+.resumo-analise h3{color:var(--red);margin:0 0 16px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.resumo-dados{margin-bottom:16px;}
+.resumo-dados p{margin:6px 0;font-size:13px;color:var(--ink-mid);}
+.resumo-dados strong{color:var(--ink);}
+
+.resumo-stats{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;padding:14px;background:#f8f7f4;border-radius:8px;}
+.resumo-stats span{padding:6px 12px;border-radius:14px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px;}
+.rs-dispensada{background:#dcfce7;color:#166534;}
+.rs-complementar{background:#fef3c7;color:#92400e;}
+.rs-cursar{background:#fee2e2;color:#991b1b;}
+.rs-ementas{background:#dbeafe;color:#1d4ed8;}
+
+.resumo-ch{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0;}
+.resumo-ch-item{text-align:center;padding:12px;background:#faf9f7;border-radius:8px;}
+.resumo-ch-item .ch-val{font-size:20px;font-weight:700;color:var(--ink);}
+.resumo-ch-item .ch-label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;margin-top:4px;}
+.resumo-ch-item.dispensada .ch-val{color:var(--green);}
+.resumo-ch-item.complementar .ch-val{color:var(--amber);}
+.resumo-ch-item.cursar .ch-val{color:var(--red);}
+
+.resumo-aviso{font-size:12px;color:var(--ink-soft);font-style:italic;margin-top:16px;padding-top:12px;border-top:1px solid #e8e4de;display:flex;align-items:center;gap:8px;}
+.resumo-aviso::before{content:"ℹ️";}
+
+.resumo-disc{margin-top:16px;}
+.resumo-disc h4{font-size:12px;color:var(--ink-mid);margin-bottom:8px;}
+.resumo-disc-list{display:flex;flex-direction:column;gap:6px;}
+.resumo-disc-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 10px;background:#faf9f7;border-radius:6px;}
+.resumo-disc-item .sd-status{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.resumo-disc-item .sd-status.dispensada{background:var(--green);}
+.resumo-disc-item .sd-status.complementar{background:var(--amber);}
+.resumo-disc-item .sd-status.cursar{background:var(--red);}
+.resumo-disc-item .sd-status.ementas{background:var(--blue);}
+.resumo-disc-item .sd-nome{flex:1;}
+.resumo-disc-item .sd-ch{color:var(--ink-soft);font-size:11px;}
+
 /* ── PRINT ── */
 @media print {
   *{print-color-adjust:exact;-webkit-print-color-adjust:exact;}

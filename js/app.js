@@ -251,6 +251,13 @@ async function handleFileUpload(file, tipo) {
     renderImportedDisciplinas(disciplinasImportadas);
     renderMatchingResult(matchingResults);
     
+    const dadosAluno = {
+      nome: document.getElementById("nome").value.trim(),
+      matricula: document.getElementById("matricula").value.trim(),
+      origem: document.getElementById("origem").value.trim()
+    };
+    renderResumoAnalise(matchingResults, dadosAluno);
+    
     const applyBtn = document.getElementById("btn-aplicar-matching");
     if (applyBtn) applyBtn.style.display = "inline-flex";
     
@@ -397,6 +404,7 @@ function limparImportacao() {
   matchingResults = [];
   renderImportedDisciplinas([]);
   renderMatchingResult([]);
+  renderResumoAnalise([], {});
   
   const applyBtn = document.getElementById("btn-aplicar-matching");
   if (applyBtn) applyBtn.style.display = "none";

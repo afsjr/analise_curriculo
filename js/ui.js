@@ -250,6 +250,84 @@ function renderMatchingResult(matchingResults) {
   `;
 }
 
+function renderResumoAnalise(matchingResults, dadosAluno) {
+  const container = document.getElementById("resumo-analise-container");
+  if (!container) return;
+  
+  if (!matchingResults || matchingResults.length === 0) {
+    container.style.display = "none";
+    return;
+  }
+  
+  const porStatus = {
+    dispensada: matchingResults.filter(m => m.status === "dispensada"),
+    complementar: matchingResults.filter(m => m.status === "complementar"),
+    cursar: matchingResults.filter(m => m.status === "cursar"),
+    ementas: matchingResults.filter(m => m.status === "ementas")
+  };
+  
+  const chTotal = matchingResults.reduce((s, m) => s + m.ch, 0);
+  const chDisp = porStatus.dispensada.reduce((s, m) => s + m.ch, 0);
+  const chComp = porStatus.complementar.reduce((s, m) => s + m.ch, 0);
+  const chCursar = porStatus.cursar.reduce((s, m) => s + m.ch, 0) + porStatus.ementas.reduce((s, m) => s + m.ch, 0);
+  
+  container.style.display = "block";
+  container.innerHTML = `
+    <div class="resumo-analise">
+      <h3>Resumo da Análise de Aproveitamento</h3>
+      
+      <div class="resumo-dados">
+        <p><strong>Aluno:</strong> ${dadosAluno.nome || "não informado"}</p>
+        <p><strong>Instituição de origem:</strong> ${dadosAluno.origem || "não informada"}</p>
+        <p><strong>Disciplinas analisadas:</strong> ${matchingResults.length}</p>
+      </div>
+      
+      <div class="resumo-stats">
+        <span class="rs-dispensada">✓ ${porStatus.dispensada.length} dispensadas</span>
+        <span class="rs-complementar">◐ ${porStatus.complementar.length} complementares</span>
+        <span class="rs-cursar">● ${porStatus.cursar.length} a cursar</span>
+        <span class="rs-ementas">⏳ ${porStatus.ementas.length} ag. ementas</span>
+      </div>
+      
+      <div class="resumo-ch">
+        <div class="resumo-ch-item">
+          <div class="ch-val">${chTotal}h</div>
+          <div class="ch-label">Total Origem</div>
+        </div>
+        <div class="resumo-ch-item dispensada">
+          <div class="ch-val">${chDisp}h</div>
+          <div class="ch-label">Dispensada</div>
+        </div>
+        <div class="resumo-ch-item complementar">
+          <div class="ch-val">${chComp}h</div>
+          <div class="ch-label">Complementar</div>
+        </div>
+        <div class="resumo-ch-item cursar">
+          <div class="ch-val">${chCursar}h</div>
+          <div class="ch-label">A Cursar</div>
+        </div>
+      </div>
+      
+      <div class="resumo-disc">
+        <h4>Detalhamento por Disciplina</h4>
+        <div class="resumo-disc-list">
+          ${matchingResults.map(m => `
+            <div class="resumo-disc-item">
+              <span class="sd-status ${m.status}"></span>
+              <span class="sd-nome">${m.nome}</span>
+              <span class="sd-ch">${m.ch}h → ${m.disciplinaDestino || "não encontrado"}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+      
+      <div class="resumo-aviso">
+        Revise as classificações acima. Clique em "Aplicar ao Curso" para confirmar e depois em "Calcular Parcelas".
+      </div>
+    </div>
+  `;
+}
+
 function fmt(v) {
   return "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
