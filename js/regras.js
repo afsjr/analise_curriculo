@@ -47,11 +47,11 @@ function calcularFatorModulo(modulo, estadoDisciplinas) {
     if (s === "cursar") chC += d.ch;
     if (s === "complementar") chComp += d.ch;
     if (s === "dispensada") chD += d.ch;
-    if (s === "ementas") chE += d.ch;
+    if (s === "ementas") chC += d.ch;
   });
   
   const total = modulo.totalCH;
-  const fator = (chC / total) + ((chComp / total) * REGRAS.fatorComplementar) + ((chE / total) * REGRAS.fatorEmentas);
+  const fator = (chC / total) + ((chComp / total) * REGRAS.fatorComplementar);
   const dispensadoTotal = (chC + chComp + chE) === 0;
   
   return {
@@ -85,8 +85,8 @@ function calcularTotalCurso(curso, estadoDisciplinas, valorMatricula, valorMensa
     totalGeral += totalMod;
     parcelasGeral += nPCobradas;
     
-    if (r.chE > 0 && !r.dispensadoTotal) {
-      warnings.push(`${mod.tag}: ${r.chE}h com status "Aguardando Ementas" — tratadas como complementar (1/3) até definição das ementas.`);
+    if (r.chE > 0) {
+      warnings.push(`${mod.tag}: ${r.chE}h aguardando ementas - será cursada integralmente até definição.`);
     }
     
     resMods.push({
