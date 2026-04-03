@@ -1,5 +1,63 @@
 let tesseractWorker = null;
 
+const PROCESS_PHASES = {
+  INIT: { range: [0, 10], text: "Inicializando...", estimate: "1-2s" },
+  LOAD: { range: [10, 30], text: "Carregando arquivo...", estimate: "1-3s" },
+  OCR: { range: [30, 70], text: "Reconhecendo texto (OCR)...", estimate: "5-30s" },
+  PARSE: { range: [70, 85], text: "Analisando disciplinas...", estimate: "2-5s" },
+  MATCH: { range: [85, 95], text: "Comparando com curso destino...", estimate: "1-3s" },
+  DONE: { range: [95, 100], text: "Concluído!", estimate: "" }
+};
+
+function getPhaseFromProgress(progress) {
+  if (progress < 10) return PROCESS_PHASES.INIT;
+  if (progress < 30) return PROCESS_PHASES.LOAD;
+  if (progress < 70) return PROCESS_PHASES.OCR;
+  if (progress < 85) return PROCESS_PHASES.PARSE;
+  if (progress < 95) return PROCESS_PHASES.MATCH;
+  return PROCESS_PHASES.DONE;
+}
+
+function estimateTime(tipo, tamanhoMB) {
+  const estimates = {
+    imagem: { base: 5, perMB: 8 },
+    pdf: { base: 2, perMB: 3 },
+    doc: { base: 1, perMB: 2 }
+  };
+  
+  const config = estimates[tipo] || estimates.imagem;
+  const segundos = config.base + (tamanhoMB * config.perMB);
+  
+  if (segundos < 10) return "~5-10 segundos";
+  if (segundos < 30) return "~10-30 segundos";
+  if (segundos < 60) return "~30-60 segundos";
+  return "~1-2 minutos";
+}
+
+function createProgressCallback(onProgress) {
+  let startTime = Date.now();
+  let lastUpdate = 0;
+  
+  return (progress, message) => {
+    const now = Date.now();
+    if (now - lastUpdate < 200 && progress < 100) return;
+    lastUpdate = now;
+    
+    const phase = getPhaseFromProgress(progress);
+    const elapsed = Math.round((now - startTime) / 1000);
+    const elapsedStr = elapsed > 60 ? `${Math.floor(elapsed/60)}m ${elapsed%60}s` : `${elapsed}s`;
+    
+    const progressData = {
+      percent: progress,
+      phase: message || phase.text,
+      estimate: phase.estimate,
+      elapsed: elapsedStr
+    };
+    
+    if (onProgress) onProgress(progressData);
+  };
+}
+
 async function initOCR() {
   if (!tesseractWorker) {
     tesseractWorker = await Tesseract.createWorker('por');
@@ -8,39 +66,67 @@ async function initOCR() {
 }
 
 async function processImageOCR(file, onProgress) {
+  const progressCb = createProgressCallback(onProgress);
+  
   try {
+    progressCb(5, "Inicializando OCR...");
     const worker = await initOCR();
+    
+    progressCb(20, "Processando imagem...");
     
     const result = await worker.recognize(file, {}, {
       logger: m => {
-        if (onProgress && m.status === 'recognizing text') {
-          onProgress(Math.round(m.progress * 100));
+        if (m.status === 'loading tesseract core') {
+          progressCb(25, "Carregando motor OCR...");
+        } else if (m.status === 'initializing api') {
+          progressCb(30, "Inicializando API...");
+        } else if (m.status === 'recognizing text') {
+          const ocrProgress = 30 + Math.round(m.progress * 40);
+          progressCb(ocrProgress, "Reconhecendo texto...");
         }
       }
     });
     
-    return parseTextoHistorico(result.data.text);
+    progressCb(75, "Analisando texto extraído...");
+    const disciplinas = parseTextoHistorico(result.data.text);
+    
+    progressCb(90, "Finalizando...");
+    return disciplinas;
+    
   } catch (error) {
     console.error("Erro no OCR:", error);
-    throw new Error("Falha ao processar imagem. Tente uma imagem mais legível.");
+    if (error.message.includes("Failed to load image")) {
+      throw new Error("não_conseguiu: O sistema não conseguiu ler a imagem. O arquivo pode estar corrompido ou em formato não suportado. Tente usar a digitação manual.");
+    }
+    if (error.message.includes("timeout") || error.message.includes("network")) {
+      throw new Error("timeout: O processamento demorou mais que o esperado. Tente uma imagem menor ou use a digitação manual.");
+    }
+    throw new Error("não_conseguiu: Falha ao processar imagem. Tente uma imagem mais legível ou adicione manualmente.");
   }
 }
 
 async function processPDF(file, onProgress) {
+  const progressCb = createProgressCallback(onProgress);
+  
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    
     reader.onload = async function(e) {
       try {
+        progressCb(10, "Lendo arquivo PDF...");
         const typedarray = new Uint8Array(e.target.result);
+        
+        progressCb(20, "Abrindo documento...");
         const pdf = await pdfjsLib.getDocument(typedarray).promise;
         
         let textoCompleto = "";
         const totalPages = pdf.numPages;
         
+        progressCb(25, `Processando ${totalPages} páginas...`);
+        
         for (let i = 1; i <= totalPages; i++) {
-          if (onProgress) {
-            onProgress(Math.round((i / totalPages) * 100));
-          }
+          const progressPage = 25 + Math.round((i / totalPages) * 50);
+          progressCb(progressPage, `Processando página ${i} de ${totalPages}...`);
           
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
@@ -48,13 +134,31 @@ async function processPDF(file, onProgress) {
           textoCompleto += pageText + "\n";
         }
         
-        resolve(parseTextoHistorico(textoCompleto));
+        progressCb(80, "Extraindo disciplinas...");
+        const disciplinas = parseTextoHistorico(textoCompleto);
+        
+        if (disciplinas.length === 0) {
+          progressCb(95, "Verificando resultado...");
+          reject(new Error("não_conseguiu: O sistema não encontrou disciplinas no PDF. O documento pode estar em formato de imagem (scaneado) ou sem texto selecionável. Tente usar OCR (imagem) ou a digitação manual."));
+          return;
+        }
+        
+        progressCb(95, "Finalizando...");
+        resolve(disciplinas);
+        
       } catch (error) {
         console.error("Erro ao processar PDF:", error);
-        reject(new Error("Falha ao extrair texto do PDF."));
+        if (error.message.includes("não_conseguiu")) {
+          reject(error);
+        } else if (error.name === "MissingPDFException") {
+          reject(new Error("não_conseguiu: O arquivo PDF está corrompido ou inválido. Tente outro arquivo."));
+        } else {
+          reject(new Error("não_conseguiu: Falha ao processar PDF. Tente outro arquivo ou use a digitação manual."));
+        }
       }
     };
-    reader.onerror = () => reject(new Error("Falha ao ler arquivo."));
+    
+    reader.onerror = () => reject(new Error("não_conseguiu: Falha ao ler arquivo. O arquivo pode estar corrompido."));
     reader.readAsArrayBuffer(file);
   });
 }
@@ -62,19 +166,28 @@ async function processPDF(file, onProgress) {
 async function processDOCX(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    
     reader.onload = function(e) {
       try {
         mammoth.extractRawText({ arrayBuffer: e.target.result })
-          .then(result => resolve(parseTextoHistorico(result.value)))
+          .then(result => {
+            if (!result.value || result.value.trim().length < 10) {
+              reject(new Error("não_conseguiu: O documento está vazio ou o sistema não conseguiu extrair o texto. Tente usar outro arquivo ou a digitação manual."));
+              return;
+            }
+            const disciplinas = parseTextoHistorico(result.value);
+            resolve(disciplinas);
+          })
           .catch(err => {
             console.error("Erro ao processar DOCX:", err);
-            reject(new Error("Falha ao processar arquivo Word."));
+            reject(new Error("não_conseguiu: Falha ao processar arquivo Word. O formato pode não ser suportado. Tente salvar como .docx ou use a digitação manual."));
           });
       } catch (error) {
-        reject(new Error("Falha ao ler arquivo Word."));
+        reject(new Error("não_conseguiu: Falha ao ler arquivo Word. O arquivo pode estar corrompido."));
       }
     };
-    reader.onerror = () => reject(new Error("Falha ao ler arquivo."));
+    
+    reader.onerror = () => reject(new Error("não_conseguiu: Falha ao ler arquivo Word."));
     reader.readAsArrayBuffer(file);
   });
 }
@@ -290,12 +403,42 @@ async function processarArquivo(file, tipo, onProgress) {
   const ext = file.name.split('.').pop().toLowerCase();
   
   if (tipo === 'imagem' && extensoes.imagem.includes(ext)) {
-    return await processImageOCR(file, onProgress);
+    return await processWithTimeout(file, 'imagem', onProgress, () => processImageOCR(file, onProgress));
   } else if (tipo === 'pdf' && extensoes.pdf.includes(ext)) {
-    return await processPDF(file, onProgress);
+    return await processWithTimeout(file, 'pdf', onProgress, () => processPDF(file, onProgress));
   } else if (tipo === 'doc' && extensoes.doc.includes(ext)) {
-    return await processDOCX(file);
+    return await processWithTimeout(file, 'doc', onProgress, () => processDOCX(file));
   } else {
     throw new Error(`Tipo de arquivo não suportado para ${tipo}: .${ext}`);
   }
+}
+
+async function processWithTimeout(file, tipo, onProgress, processFn) {
+  const timeouts = {
+    imagem: 45000,
+    pdf: 30000,
+    doc: 20000
+  };
+  
+  const timeoutMs = timeouts[tipo] || 30000;
+  
+  let timeoutHandle;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutHandle = setTimeout(() => {
+      reject(new Error(`timeout: O processamento excedeu o tempo limite (${timeoutMs/1000}s). O arquivo pode ser muito grande ou o dispositivo não tem recursos suficientes. Tente um arquivo menor ou use a digitação manual.`));
+    }, timeoutMs);
+  });
+  
+  try {
+    const result = await Promise.race([processFn(), timeoutPromise]);
+    clearTimeout(timeoutHandle);
+    return result;
+  } catch (error) {
+    clearTimeout(timeoutHandle);
+    throw error;
+  }
+}
+
+function isCapableError(error) {
+  return error.message && (error.message.startsWith("não_conseguiu:") || error.message.startsWith("timeout:"));
 }

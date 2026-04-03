@@ -7,11 +7,14 @@ Ferramenta interna para análise de históricos acadêmicos e cálculo financeir
 ## 🚀 Funcionalidades
 
 - **Carregamento de Histórico**: Imagem (OCR), PDF, Word ou digitação manual
+- **Indicador de Progresso**: Barra de progresso em tempo real com fases
+- **Timeout Automático**: Evita travamentos (45s imagem, 30s PDF, 20s Word)
+- **Feedback de Capacidade**: Mensagens claras quando sistema não consegue processar
 - **Matching Automático**: Relaciona disciplinas da origem com o curso destino
 - **Classificação Inteligente**: Aplica critérios pedagógicos automaticamente
 - **Cálculo Financeiro**: Parcelas, total e economia
 - **Relatórios**: Carta de aproveitamento, PDF, impressão
-- **Histórico**: Salva atendimentos no navegador
+- **Histórico**: Salva atendimentos no navegador (localStorage)
 
 ---
 
@@ -51,13 +54,25 @@ analise_curriculo/
 
 1. Abra `index.html` no navegador
 2. Preencha os dados do aluno
-3. Carregue o histórico acadêmico
-4. Revise o matching automático
-5. Ajuste classificações se necessário
-6. Calcule as parcelas
-7. Gere o relatório
+3. Carregue o histórico acadêmico (imagem/PDF/Word/manual)
+4. Observe o progresso do processamento
+5. Se houver timeout, use a digitação manual
+6. Revise o matching automático
+7. Ajuste classificações se necessário
+8. Calcule as parcelas
+9. Gere o relatório
 
 Consulte [manual.md](./manual.md) para instruções detalhadas.
+
+---
+
+## ⏱️ Tempo de Processamento
+
+| Tipo | Tempo Limite | Tempo Típico (PC) |
+|------|--------------|-------------------|
+| Imagem (OCR) | 45s | 10-30s |
+| PDF | 30s | 2-10s |
+| Word | 20s | 1-5s |
 
 ---
 
@@ -75,7 +90,7 @@ Consulte [manual.md](./manual.md) para instruções detalhadas.
 
 - [ ] Implementar banco de dados
 - [ ] Adicionar outros cursos
-- [ ] Melhorar OCR
+- [ ] Melhorar OCR com cache
 - [ ] Autenticação de usuários
 - [ ] Backup em nuvem
 
@@ -87,5 +102,5 @@ Uso interno - CSM Tec Santa Mônica
 
 ---
 
-**Versão:** 2.0  
+**Versão:** 2.1  
 **Atualizado:** 2026-04-03

@@ -182,21 +182,53 @@ async function handleFileUpload(file, tipo) {
   const statusEl = document.getElementById("ocr-status");
   const previewEl = document.getElementById("upload-preview");
   
+  const tamanhoMB = file.size / (1024 * 1024);
+  const tempoEstimado = estimateTime(tipo, tamanhoMB);
+  
   if (loadingEl) loadingEl.style.display = "block";
-  if (statusEl) statusEl.textContent = "Processando arquivo...";
+  if (statusEl) {
+    statusEl.className = "ocr-status";
+    statusEl.innerHTML = `
+      <div class="ocr-loading">
+        <div class="spinner"></div>
+      </div>
+      <div style="margin-bottom:8px;font-weight:600;">Processando arquivo...</div>
+      <div class="time-estimate">Tempo estimado: ${tempoEstimado}</div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill animated" id="progress-fill" style="width:5%"></div>
+        </div>
+      </div>
+      <div class="ocr-phase">
+        <span class="phase-dot processing"></span>
+        <span id="phase-text">Inicializando...</span>
+      </div>
+    `;
+  }
   if (previewEl) previewEl.innerHTML = "";
   
   try {
-    const disciplinas = await processarArquivo(file, tipo, (progress) => {
+    const disciplinas = await processarArquivo(file, tipo, (progressData) => {
       if (statusEl) {
-        statusEl.textContent = `Processando... ${progress}%`;
+        const progressFill = document.getElementById("progress-fill");
+        const phaseText = document.getElementById("phase-text");
+        
+        if (progressFill) {
+          progressFill.style.width = `${progressData.percent}%`;
+          if (progressData.percent > 20) {
+            progressFill.classList.remove("animated");
+          }
+        }
+        if (phaseText) {
+          phaseText.textContent = progressData.phase;
+        }
       }
     });
     
     disciplinasImportadas = disciplinas;
     
     if (disciplinas.length === 0) {
-      throw new Error("Nenhuma disciplina encontrada no arquivo. Tente um arquivo mais legível ou adicione manualmente.");
+      throw new Error("não_conseguiu: Nenhuma disciplina encontrada no arquivo. O documento pode não conter disciplinas no formato esperado. Tente usar a digitação manual.");
     }
     
     const curso = CURSOS[cursoAtual];
@@ -206,17 +238,57 @@ async function handleFileUpload(file, tipo) {
     
     if (loadingEl) loadingEl.style.display = "none";
     
+    if (statusEl) {
+      statusEl.className = "ocr-status success";
+      statusEl.innerHTML = `
+        <div style="font-weight:600;margin-bottom:4px;">Sucesso!</div>
+        <div>${disciplinas.length} disciplinas encontradas e processadas.</div>
+        <div style="font-size:12px;margin-top:4px;">Revise o matching e clique em "Aplicar ao Curso".</div>
+      `;
+    }
+    
     renderImportedDisciplinas(disciplinasImportadas);
     renderMatchingResult(matchingResults);
     
     const applyBtn = document.getElementById("btn-aplicar-matching");
     if (applyBtn) applyBtn.style.display = "inline-flex";
     
-    alert(`Encontradas ${disciplinas.length} disciplinas. Revise o matching automático e clique em "Aplicar ao Curso".`);
-    
   } catch (error) {
     if (loadingEl) loadingEl.style.display = "none";
-    alert(error.message);
+    
+    if (isCapableError(error)) {
+      let titulo = "O sistema não conseguiu processar o documento";
+      let mensagem = error.message;
+      
+      if (error.message.startsWith("timeout:")) {
+        titulo = "Tempo limite excedido";
+        mensagem = error.message.replace("timeout: ", "");
+      } else {
+        mensagem = error.message.replace("não_conseguiu: ", "");
+      }
+      
+      if (statusEl) {
+        statusEl.className = "ocr-status warning";
+        statusEl.innerHTML = `
+          <span class="warning-title">${titulo}</span>
+          ${mensagem}
+          <div class="warning-hint" style="margin-top:12px;">
+            <strong>Alternativas:</strong>
+            <ul style="margin:8px 0 0 16px;padding:0;">
+              <li>Use a aba "Manual" para digitar as disciplinas</li>
+              <li>Tente um arquivo menor (reduza o tamanho da imagem/PDF)</li>
+              <li>Para PDFs scaneados, use a opção de Imagem</li>
+              <li>Use um dispositivo com mais recursos (PC ao invés de mobile)</li>
+            </ul>
+          </div>
+        `;
+      }
+    } else {
+      if (statusEl) {
+        statusEl.className = "ocr-status error";
+        statusEl.textContent = "Erro: " + error.message;
+      }
+    }
   }
 }
 

@@ -74,6 +74,27 @@ main{max-width:1120px;margin:0 auto;padding:28px 24px 60px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .ocr-status{font-size:14px;color:var(--ink-mid);}
 
+/* ── PROGRESS BAR ── */
+.progress-container{margin-top:12px;}
+.progress-bar{height:8px;background:#e8e4de;border-radius:4px;overflow:hidden;margin-top:8px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--red) 0%,var(--red-l) 100%);transition:width 0.3s ease;border-radius:4px;}
+.progress-fill.animated{animation:progress-pulse 1.5s ease-in-out infinite;}
+@keyframes progress-pulse{0%,100%{opacity:1;}50%{opacity:0.7;}}
+
+.ocr-phase{font-size:11px;color:var(--ink-soft);margin-top:8px;display:flex;align-items:center;gap:6px;}
+.ocr-phase .phase-dot{width:8px;height:8px;background:var(--green);border-radius:50%;}
+.ocr-phase .phase-dot.processing{background:var(--amber);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.ocr-status.error{color:var(--red);}
+.ocr-status.warning{background:var(--amber-pale);border:1px solid var(--amber-border);border-radius:8px;padding:12px;font-size:13px;color:var(--amber);text-align:left;}
+.ocr-status.warning .warning-title{font-weight:600;margin-bottom:8px;display:block;}
+.ocr-status.warning .warning-hint{font-size:12px;opacity:0.8;}
+
+.ocr-status.success{color:var(--green);background:var(--green-pale);border:1px solid var(--green-border);border-radius:8px;padding:12px;}
+
+.time-estimate{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+
 /* ── MANUAL INPUT ── */
 .manual-add-row{display:flex;gap:10px;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap;}
 .manual-add-row .form-group{flex:1;min-width:150px;}
