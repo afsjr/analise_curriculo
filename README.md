@@ -15,6 +15,7 @@ Ferramenta interna para análise de históricos acadêmicos e cálculo financeir
 - **Cálculo Financeiro**: Parcelas, total e economia
 - **Relatórios**: Carta de aproveitamento, PDF, impressão
 - **Histórico**: Salva atendimentos no navegador (localStorage)
+- **Hospedagem**: Totalmente compatível com GitHub Pages
 
 ---
 
@@ -32,9 +33,10 @@ analise_curriculo/
 │   ├── parser.js      # OCR e parsing de arquivos
 │   ├── relatorios.js  # Geração de PDF e carta
 │   └── app.js         # Lógica principal e estado
-├── manual.md          # Guia de uso
+├── assets/           # Recursos estáticos (logo)
+├── manual.md         # Guia de uso
 ├── memoria.md        # Documentação técnica
-└── README.md         # Este arquivo
+└── README.md        # Este arquivo
 ```
 
 ---
@@ -61,6 +63,8 @@ analise_curriculo/
 7. Ajuste classificações se necessário
 8. Calcule as parcelas
 9. Gere o relatório
+
+**Nota**: Em ambiente de hospedagem (como GitHub Pages), permita pop-ups para gerar a carta de aproveitamento.
 
 Consulte [manual.md](./manual.md) para instruções detalhadas.
 

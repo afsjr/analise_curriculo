@@ -2,7 +2,7 @@
 
 **Projeto:** Calculadora de Aproveitamento de Estudos - CSM Tec  
 **Última atualização:** 2026-04-03  
-**Versão do código:** 2.0
+**Versão do código:** 2.1
 
 ---
 
@@ -127,6 +127,12 @@ let matchingResults = [];               // Resultado do matching automático
 let history = [];                       // Histórico de atendimentos
 let uploadTabAtual = "imagem";          // Aba de upload ativa
 ```
+
+**Acesso via window:**
+Para compatibilidade com GitHub Pages e debugging, as variáveis também são expostas globalmente:
+- `window.cursoAtual`
+- `window.estado`
+- `window.obsState`
 
 ### 5.2 Status de Disciplinas
 
@@ -289,33 +295,29 @@ Para exportar dados:
 
 | Item | Prioridade | Descrição |
 |------|------------|-----------|
-| Testes unitários | Média | Falta cobertura de testes |
+| Testes unitários | Baixa | Removidos para simplificar deploy (sem dependências locais) |
 | Validação de input | Alta | Sanitizar entradas do usuário |
 | Loading states | Média | Indicadores de carregamento |
-| Tratamento de erros | Alta |try/catch mais robusto |
+| Tratamento de erros | Média | Try/catch já implementado, mas pode melhorar |
 | Acessibilidade | Média | ARIA labels, keyboard nav |
-| Mobile responsive | Baixa | Layout já responsivo,mas testar |
+| Mobile responsive | Baixa | Layout já responsivo, mas testar |
 | Performance OCR | Média | Otimizar imagens antes do OCR |
 
 ---
 
-## 11. Variáveis de Ambiente Futuras
+## 11. GitHub Pages
 
-Quando implementar configuração:
+O projeto é totalmente compatível com GitHub Pages. Não requer build ou dependências locais.
 
-```javascript
-// config.js
-const CONFIG = {
-  apiUrl: "https://api.csmtec.com.br",
-  storageKey: "csm_tec_history",
-  maxHistoryItems: 50,
-  cursoDefault: "enfermagem",
-  valoresDefault: {
-    matricula: 370,
-    mensalidade: 370
-  }
-};
-```
+**Deploy:**
+1. push para repositório GitHub
+2. Settings → Pages → Deploy from branch → main (root)
+3. URL: `https://[usuario].github.io/analise_curriculo/`
+
+**Configurações especiais:**
+- Não requer arquivo `package.json` ou `node_modules`
+- Todas as dependências são carregadas via CDN
+- Funções de relatório leem diretamente do DOM (sem parâmetros)
 
 ---
 

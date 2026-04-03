@@ -1,6 +1,6 @@
 # Manual da Calculadora de Aproveitamento - CSM Tec
 
-**Versão:** 2.0  
+**Versão:** 2.1  
 **Última atualização:** 2026-04-03  
 **Autor:** Equipe de Desenvolvimento
 
@@ -263,10 +263,32 @@ O sistema salva automaticamente os atendimentos no localStorage do navegador.
 - **Causa:** Biblioteca jsPDF não carregou
 - **Solução:** Use a opção "Imprimir / Salvar PDF" como alternativa
 
+### 8.5 Pop-ups bloqueados
+- **Causa:** Gerador de carta detectado como pop-up
+- **Solução:** Permita pop-ups para o site nas configurações do navegador
+
 ---
 
-## 9. Contato e Suporte
+## 9. Limitações Conhecidas
+
+### 9.1 Ambiente de Hospedagem
+Ao usar a calculadora em hospedagem online (como GitHub Pages):
+- Alguns navegadores podem bloquear a geração de pop-ups para a carta de aproveitamento
+- A função de copiar resumo usa método alternativo quando a API de clipboard não está disponível
+
+### 9.2 Navegadores Suportados
+- Chrome/Edge (recomendado)
+- Firefox
+- Safari
+
+### 9.3 Dispositivos
+- **Desktop**: Funcionalidade completa
+- **Mobile**: Limitado (OCR pode ser lento)
+
+---
+
+## 10. Contato e Suporte
 
 Para dúvidas ou problemas, contacte a equipe de desenvolvimento.
 
-**Versão do documento:** 2.0
+**Versão do documento:** 2.1
