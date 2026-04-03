@@ -6,13 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSM Tec — Calculadora de Aproveitamento</title>
   <link rel="stylesheet" href="css/estilos.css">
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  </script>
 </head>
 
 <body>
@@ -66,55 +59,10 @@
         <h2>Carregar Histórico Acadêmico</h2>
 
         <div class="upload-tabs">
-          <button class="upload-tab active" onclick="switchUploadTab('imagem', this)">Imagem</button>
-          <button class="upload-tab" onclick="switchUploadTab('pdf', this)">PDF</button>
-          <button class="upload-tab" onclick="switchUploadTab('doc', this)">Word</button>
           <button class="upload-tab" onclick="switchUploadTab('manual', this)">Manual</button>
         </div>
 
-        <div id="upload-imagem" class="upload-content" style="display: block;">
-          <div class="upload-area">
-            <input type="file" id="input-imagem" accept="image/*" style="display:none">
-            <div class="upload-icon">📷</div>
-            <div class="upload-text">Arraste ou clique para carregar imagem do histórico</div>
-            <div class="upload-hint">JPG, PNG, GIF, WEBP</div>
-            <div class="upload-preview"></div>
-            <div class="ocr-loading" style="display:none">
-              <div class="spinner"></div>
-              <div class="ocr-status">Processando...</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="upload-pdf" class="upload-content">
-          <div class="upload-area">
-            <input type="file" id="input-pdf" accept=".pdf" style="display:none">
-            <div class="upload-icon">📄</div>
-            <div class="upload-text">Arraste ou clique para carregar PDF do histórico</div>
-            <div class="upload-hint">Arquivo PDF</div>
-            <div class="upload-preview"></div>
-            <div class="ocr-loading" style="display:none">
-              <div class="spinner"></div>
-              <div class="ocr-status">Processando...</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="upload-doc" class="upload-content">
-          <div class="upload-area">
-            <input type="file" id="input-doc" accept=".doc,.docx" style="display:none">
-            <div class="upload-icon">📝</div>
-            <div class="upload-text">Arraste ou clique para carregar arquivo Word</div>
-            <div class="upload-hint">DOC, DOCX</div>
-            <div class="upload-preview"></div>
-            <div class="ocr-loading" style="display:none">
-              <div class="spinner"></div>
-              <div class="ocr-status">Processando...</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="upload-manual" class="upload-content">
+        <div id="upload-manual" class="upload-content" style="display: block;">
           <div class="manual-add-row">
             <div class="form-group">
               <label>Nome da disciplina</label>

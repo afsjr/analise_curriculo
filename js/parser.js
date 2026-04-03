@@ -358,39 +358,6 @@ function aplicarMatchingAoEstado(matchingResults) {
 }
 
 function setupUploadArea() {
-  const uploadAreas = document.querySelectorAll('.upload-area');
-  
-  uploadAreas.forEach(area => {
-    area.addEventListener('click', () => {
-      const input = area.querySelector('input[type="file"]');
-      if (input) input.click();
-    });
-    
-    area.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      area.classList.add('dragover');
-    });
-    
-    area.addEventListener('dragleave', () => {
-      area.classList.remove('dragover');
-    });
-    
-    area.addEventListener('drop', (e) => {
-      e.preventDefault();
-      area.classList.remove('dragover');
-      
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        const input = area.querySelector('input[type="file"]');
-        if (input) {
-          const dt = new DataTransfer();
-          dt.items.add(files[0]);
-          input.files = dt.files;
-          input.dispatchEvent(new Event('change'));
-        }
-      }
-    });
-  });
 }
 
 async function processarArquivo(file, tipo, onProgress) {

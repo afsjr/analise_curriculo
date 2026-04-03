@@ -9,13 +9,20 @@ let uploadTabAtual = "imagem";
 const STORAGE_KEY = "csm_tec_history";
 
 function init() {
-  loadHistory();
-  renderCourseSelector(cursoAtual);
-  resetEstado();
-  renderGrade(CURSOS[cursoAtual], estado, obsState);
-  setupUploadArea();
-  setupFileInputs();
-  setupManualInput();
+  console.log("Inicializando...");
+  try {
+    loadHistory();
+    renderCourseSelector(cursoAtual);
+    resetEstado();
+    renderGrade(CURSOS[cursoAtual], estado, obsState);
+    setupUploadArea();
+    setupFileInputs();
+    setupManualInput();
+    console.log("Inicialização concluída com sucesso");
+    console.log("estado inicial:", estado);
+  } catch (e) {
+    console.error("Erro na inicialização:", e);
+  }
 }
 
 function loadHistory() {
@@ -160,19 +167,6 @@ function removerHistorico(id) {
 }
 
 function setupFileInputs() {
-  const inputImage = document.getElementById("input-imagem");
-  const inputPdf = document.getElementById("input-pdf");
-  const inputDoc = document.getElementById("input-doc");
-  
-  if (inputImage) {
-    inputImage.addEventListener("change", (e) => handleFileUpload(e.target.files[0], "imagem"));
-  }
-  if (inputPdf) {
-    inputPdf.addEventListener("change", (e) => handleFileUpload(e.target.files[0], "pdf"));
-  }
-  if (inputDoc) {
-    inputDoc.addEventListener("change", (e) => handleFileUpload(e.target.files[0], "doc"));
-  }
 }
 
 async function handleFileUpload(file, tipo) {
@@ -410,7 +404,7 @@ function limparImportacao() {
   if (applyBtn) applyBtn.style.display = "none";
 }
 
-window.onload = init;
+document.addEventListener('DOMContentLoaded', init);
 
 window.cursoAtual = cursoAtual;
 window.estado = estado;
