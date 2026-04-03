@@ -19,6 +19,8 @@ header{background:linear-gradient(135deg,#1a0303 0%,#6b0f0f 40%,#9b1c1c 100%);co
 .header-text h1{font-family:"DM Serif Display",serif;font-size:20px;font-weight:400;letter-spacing:.3px;}
 .header-text p{font-size:12px;opacity:.7;margin-top:3px;font-weight:300;}
 .header-badge{margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:600;letter-spacing:.5px;flex-shrink:0;}
+.header-badge.versao-desatualizada{background:var(--amber);color:#000;animation:pulse-badge 2s infinite;cursor:pointer;}
+@keyframes pulse-badge{0%,100%{opacity:1;}50%{opacity:0.7;}}
 
 /* ── TABS ── */
 .tabs-bar{background:#fff;border-bottom:2px solid #ebe8e2;display:flex;gap:0;padding:0 40px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(26,26,46,.06);}
