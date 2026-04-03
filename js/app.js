@@ -178,9 +178,11 @@ function setupFileInputs() {
 async function handleFileUpload(file, tipo) {
   if (!file) return;
   
-  const loadingEl = document.getElementById("ocr-loading");
-  const statusEl = document.getElementById("ocr-status");
-  const previewEl = document.getElementById("upload-preview");
+  // Buscar elementos dentro da aba ativa
+  const uploadContent = document.getElementById("upload-" + tipo);
+  const loadingEl = uploadContent ? uploadContent.querySelector(".ocr-loading") : null;
+  const statusEl = uploadContent ? uploadContent.querySelector(".ocr-status") : null;
+  const previewEl = uploadContent ? uploadContent.querySelector(".upload-preview") : null;
   
   const tamanhoMB = file.size / (1024 * 1024);
   const tempoEstimado = estimateTime(tipo, tamanhoMB);
@@ -196,12 +198,12 @@ async function handleFileUpload(file, tipo) {
       <div class="time-estimate">Tempo estimado: ${tempoEstimado}</div>
       <div class="progress-container">
         <div class="progress-bar">
-          <div class="progress-fill animated" id="progress-fill" style="width:5%"></div>
+          <div class="progress-fill animated" style="width:5%"></div>
         </div>
       </div>
       <div class="ocr-phase">
         <span class="phase-dot processing"></span>
-        <span id="phase-text">Inicializando...</span>
+        <span>Inicializando...</span>
       </div>
     `;
   }
@@ -209,9 +211,9 @@ async function handleFileUpload(file, tipo) {
   
   try {
     const disciplinas = await processarArquivo(file, tipo, (progressData) => {
-      if (statusEl) {
-        const progressFill = document.getElementById("progress-fill");
-        const phaseText = document.getElementById("phase-text");
+      if (statusEl && loadingEl) {
+        const progressFill = loadingEl.querySelector(".progress-fill");
+        const phaseSpan = loadingEl.querySelector(".ocr-phase span:last-child");
         
         if (progressFill) {
           progressFill.style.width = `${progressData.percent}%`;
@@ -219,8 +221,8 @@ async function handleFileUpload(file, tipo) {
             progressFill.classList.remove("animated");
           }
         }
-        if (phaseText) {
-          phaseText.textContent = progressData.phase;
+        if (phaseSpan) {
+          phaseSpan.textContent = progressData.phase;
         }
       }
     });
