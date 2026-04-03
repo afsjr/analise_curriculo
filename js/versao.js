@@ -16,7 +16,6 @@ async function verificarVersaoGitHub() {
     });
     
     if (!response.ok) {
-      console.log("Não foi possível verificar versão no GitHub");
       return;
     }
     
@@ -25,10 +24,7 @@ async function verificarVersaoGitHub() {
     
     badge.title = `Último commit no GitHub: ${latestCommit}`;
     
-    console.log(`Versão atual: ${VERSAO.versao} | GitHub: ${latestCommit}`);
-    
   } catch (error) {
-    console.log("Erro ao verificar versão:", error.message);
   }
 }
 

@@ -2,7 +2,7 @@
 
 **Projeto:** Calculadora de Aproveitamento de Estudos - CSM Tec  
 **Última atualização:** 2026-04-03  
-**Versão do código:** 2.1
+**Versão do código:** 2.0
 
 ---
 
@@ -154,7 +154,7 @@ Arquivo → Tesseract.js → Texto → parseTextoHistorico() → disciplinas
 
 ### 6.2 PDF
 ```
-Arquivo → PDF.js → Texto extraído (página a página) → parseTextoHistorico() → disciplinas
+Arquivo → PDF.js → Texto extraído → parseTextoHistorico() → disciplinas
 ```
 
 ### 6.3 DOCX
@@ -166,63 +166,11 @@ Arquivo → mammoth.js → Texto raw → parseTextoHistorico() → disciplinas
 ```
 disciplinasImportadas → matchingDisciplinas() → matchingResults
                            ↓
-             Para cada disciplina importada:
-             - Calcula similaridade com grade destino
-             - Aplica regras de análise (75%, 40%)
-             - Retorna status sugerido
+            Para cada disciplina importada:
+            - Calcula similaridade com grade destino
+            - Aplica regras de análise (75%, 40%)
+            - Retorna status sugerido
 ```
-
-### 6.5 Sistema de Progresso
-
-O sistema implementa feedback visual em tempo real:
-
-**Fases (PROCESS_PHASES em parser.js):**
-```javascript
-const PROCESS_PHASES = {
-  INIT: { range: [0, 10], text: "Inicializando..." },
-  LOAD: { range: [10, 30], text: "Carregando arquivo..." },
-  OCR: { range: [30, 70], text: "Reconhecendo texto (OCR)..." },
-  PARSE: { range: [70, 85], text: "Analisando disciplinas..." },
-  MATCH: { range: [85, 95], text: "Comparando com curso destino..." },
-  DONE: { range: [95, 100], text: "Concluído!" }
-};
-```
-
-**Estrutura do callback de progresso:**
-```javascript
-{
-  percent: 65,
-  phase: "Reconhecendo texto (OCR)...",
-  estimate: "15-25s",
-  elapsed: "8s"
-}
-```
-
-### 6.6 Timeout
-
-| Tipo de Arquivo | Timeout | Justificativa |
-|-----------------|---------|---------------|
-| Imagem (OCR) | 45 segundos | OCR é mais pesado |
-| PDF | 30 segundos | Extração mais rápida |
-| DOCX | 20 segundos | Processamento leve |
-
-**Implementação (parser.js):**
-```javascript
-async function processWithTimeout(file, tipo, onProgress, processFn) {
-  const timeouts = { imagem: 45000, pdf: 30000, doc: 20000 };
-  const timeoutMs = timeouts[tipo] || 30000;
-  
-  return Promise.race([
-    processFn(),
-    new Promise((_, reject) => setTimeout(() => 
-      reject(new Error("timeout: ...")), timeoutMs))
-  ]);
-}
-```
-
-**Tipos de erro:**
-- `"não_conseguiu:"` - Sistema não conseguiu processar o documento
-- `"timeout:"` - Tempo limite excedido
 
 ---
 
@@ -232,17 +180,12 @@ async function processWithTimeout(file, tipo, onProgress, processFn) {
 
 | Função | Descrição |
 |--------|-----------|
-| `processImageOCR(file, onProgress)` | OCR de imagem com suporte a progresso |
-| `processPDF(file, onProgress)` | Extração de PDF com progresso por página |
+| `processImageOCR(file, onProgress)` | OCR de imagem |
+| `processPDF(file, onProgress)` | Extração de PDF |
 | `processDOCX(file)` | Extração de DOCX |
 | `parseTextoHistorico(texto)` | Parser genérico de texto |
 | `matchingDisciplinas(origem, destino)` | Matching automático |
 | `calcularSimilaridade(s1, s2)` | Similaridade entre textos |
-| `processWithTimeout(file, tipo, onProgress, processFn)` | Wrapper com timeout |
-| `estimateTime(tipo, tamanhoMB)` | Estima tempo baseado no tipo/tamanho |
-| `createProgressCallback(onProgress)` | Callback estruturado de progresso |
-| `getPhaseFromProgress(progress)` | Retorna fase atual do processo |
-| `isCapableError(error)` | Verifica se erro é de capacidade do sistema |
 
 ### 7.2 regras.js
 
@@ -414,4 +357,3 @@ index.html
 Para dúvidas de implementação, consulte este documento antes de modificar o código.
 
 **Última revisão:** 2026-04-03
-**Versão:** 2.1

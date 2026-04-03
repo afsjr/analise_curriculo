@@ -1,10 +1,74 @@
-function gerarCarta(dadosAluno, resultado, curso) {
-  const hoje = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+function gerarCarta() {
+  const curso = CURSOS[cursoAtual];
+  const valorMensalidade = parseFloat(document.getElementById("mensalidade").value) || 370;
+  const valorMatricula = parseFloat(document.getElementById("val_matricula").value) || 370;
+  const nome = document.getElementById("nome").value || "Aluno";
+  const matricula = document.getElementById("matricula").value || "";
+  const origem = document.getElementById("origem").value || "";
+  
+  const resultado = calcularTotalCurso(curso, estado, valorMatricula, valorMensalidade);
+  
+  const dadosAluno = {
+    nome,
+    matricula,
+    origem,
+    valorMatricula,
+    valorMensalidade
+  };
+  
+  const carta = gerarCartaContent(dadosAluno, resultado, curso);
+  
+  const win = window.open("", "_blank", "width=700,height=600");
+  if (!win) {
+    alert("Bloqueador de pop-ups detectado. Permita pop-ups para gerar a carta.");
+    return;
+  }
+  win.document.write(`
+    <html>
+    <head>
+      <title>Carta de Aproveitamento — ${nome}</title>
+      <style>
+        body {
+          font-family: monospace;
+          font-size: 13px;
+          padding: 40px;
+          white-space: pre-wrap;
+          line-height: 1.7;
+          max-width: 700px;
+          margin: 0 auto;
+        }
+        .print-btn {
+          display: block;
+          margin: 20px auto;
+          padding: 10px 24px;
+          background: #9b1c1c;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-size: 14px;
+          cursor: pointer;
+        }
+        @media print {
+          .print-btn { display: none !important; }
+        }
+      </style>
+    </head>
+    <body>
+      <button class="print-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+      ${carta.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+      <button class="print-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+    </body>
+    </html>
+  `);
+  win.document.close();
+}
+
+function gerarCartaContent(dadosAluno, resultado, curso) {
+  const hoje = new Date().toLocaleString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
   const { nome, matricula, origem, valorMatricula, valorMensalidade } = dadosAluno;
   const { totalGeral, parcelasGeral } = resultado;
   
   let linhasDisp = [], linhasComp = [], linhasCursar = [], linhasEmentas = [];
-  let justificativas = [];
   
   curso.modulos.forEach(mod => {
     mod.disciplinas.forEach(d => {
@@ -29,7 +93,7 @@ function gerarCarta(dadosAluno, resultado, curso) {
   const carta = `COLÉGIO SANTA MÔNICA TÉCNICO — CSM TEC
 Carta de Análise de Aproveitamento de Estudos
 
-Limoeiro/PE, ${hoje}
+${hoje}
 
 Prezado(a) ${nome},
 
@@ -136,19 +200,51 @@ function copiarResumo(dadosAluno, resultado, curso) {
   linhas.push("", "TOTAL: " + fmt(totalGeral) + " em " + parcelasGeral + " parcelas");
   linhas.push("Duração: " + curso.duracaoMeses + " meses (integralização com a turma)");
   
-  navigator.clipboard.writeText(linhas.join("\n"))
-    .then(() => alert("Resumo copiado para a área de transferência!"))
-    .catch(err => {
-      console.error("Erro ao copiar:", err);
-      alert("Erro ao copiar. Tente novamente.");
-    });
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(linhas.join("\n"))
+      .then(() => alert("Resumo copiado para a área de transferência!"))
+      .catch(() => {
+        const textarea = document.createElement("textarea");
+        textarea.value = linhas.join("\n");
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        alert("Resumo copiado! (método alternativo)");
+      });
+  } else {
+    const textarea = document.createElement("textarea");
+    textarea.value = linhas.join("\n");
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+    alert("Resumo copiado para a área de transferência!");
+  }
 }
 
-async function gerarPDF(dadosAluno, resultado, curso) {
+async function gerarPDF() {
   if (typeof jspdf === 'undefined') {
     alert("Biblioteca jsPDF não carregada. Use a opção de imprimir.");
     return;
   }
+  
+  const curso = CURSOS[cursoAtual];
+  const valorMensalidade = parseFloat(document.getElementById("mensalidade").value) || 370;
+  const valorMatricula = parseFloat(document.getElementById("val_matricula").value) || 370;
+  const nome = document.getElementById("nome").value || "Aluno";
+  const matricula = document.getElementById("matricula").value || "";
+  const origem = document.getElementById("origem").value || "";
+  
+  const resultado = calcularTotalCurso(curso, estado, valorMatricula, valorMensalidade);
+  
+  const dadosAluno = {
+    nome,
+    matricula,
+    origem,
+    valorMatricula,
+    valorMensalidade
+  };
   
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -285,3 +381,8 @@ function imprimirRelatorio() {
   window.print();
   setTimeout(() => { document.title = old; }, 1000);
 }
+
+window.gerarCarta = gerarCarta;
+window.copiarResumo = copiarResumo;
+window.gerarPDF = gerarPDF;
+window.imprimirRelatorio = imprimirRelatorio;

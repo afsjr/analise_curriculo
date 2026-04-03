@@ -412,6 +412,10 @@ function limparImportacao() {
 
 window.onload = init;
 
+window.cursoAtual = cursoAtual;
+window.estado = estado;
+window.obsState = obsState;
+
 window.selecionarCurso = selecionarCurso;
 window.setStatus = setStatus;
 window.calcular = calcular;
@@ -420,3 +424,9 @@ window.removerHistorico = removerHistorico;
 window.removerDisciplinaImportada = removerDisciplinaImportada;
 window.switchTab = switchTab;
 window.switchUploadTab = switchUploadTab;
+window.aplicarMatching = aplicarMatching;
+window.limparImportacao = limparImportacao;
+window.imprimirRelatorio = imprimirRelatorio;
+window.copiarResumo = copiarResumo;
+window.gerarCarta = gerarCarta;
+window.gerarPDF = gerarPDF;

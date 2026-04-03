@@ -1,6 +1,6 @@
 # Manual da Calculadora de Aproveitamento - CSM Tec
 
-**Versão:** 2.1  
+**Versão:** 2.0  
 **Última atualização:** 2026-04-03  
 **Autor:** Equipe de Desenvolvimento
 
@@ -12,13 +12,10 @@ A Calculadora de Aproveitamento de Estudos é uma ferramenta interna da equipe c
 
 **Funcionalidades principais:**
 - Carregamento de histórico acadêmico (imagem, PDF, Word ou manual)
-- Indicador de progresso em tempo real
-- Timeout automático para evitar travamentos
 - Matching automático de disciplinas
 - Classificação das disciplinas conforme critérios pedagógicos
 - Cálculo de parcelas e economia financeira
 - Geração de relatórios e cartas de aproveitamento
-- Histórico persistente no navegador
 
 ---
 
@@ -42,36 +39,30 @@ Esta seção permite importar as disciplinas do histórico do aluno através de 
 #### 2.2.1 Upload de Imagem
 - **Formatos aceitos:** JPG, PNG, GIF, WEBP
 - **Processo:** Utiliza OCR (Optical Character Recognition) via Tesseract.js
-- **Tempo limite:** 45 segundos
 - **Limitações:**
   - Imagens de baixa qualidade podem não ser processadas corretamente
   - Recomendado usar imagens com resolução mínima de 300dpi
   - O texto deve estar legível e sem sombras
-  - Dispositivos móveis podem ter processamento mais lento
 - **Como usar:**
   1. Clique na área ou arraste a imagem
-  2. Observe a barra de progresso e estimativa de tempo
-  3. Aguarde o processamento (geralmente 10-30 segundos em PC)
-  4. Revise as disciplinas detectadas
-  5. Clique em "Aplicar ao Curso"
+  2. Aguarde o processamento (pode levar alguns segundos)
+  3. Revise as disciplinas detectadas
+  4. Clique em "Aplicar ao Curso"
 
 #### 2.2.2 Upload de PDF
 - **Formato aceito:** PDF
 - **Processo:** Extrai texto do PDF e parser para identificar disciplinas
-- **Tempo limite:** 30 segundos
 - **Limitações:**
   - PDFs scaneados funcionam como imagens (requer boa qualidade)
   - PDFs com texto selecionável têm melhor precisão
 - **Como usar:**
   1. Clique na área ou arraste o arquivo PDF
-  2. Observe a barra de progresso (página por página)
-  3. Aguarde a extração de texto
-  4. Revise as disciplinas detectadas
+  2. Aguarde a extração de texto
+  3. Revise as disciplinas detectadas
 
 #### 2.2.3 Upload de Word
 - **Formatos aceitos:** DOC, DOCX
 - **Processo:** Converte para texto e parseia disciplinas
-- **Tempo limite:** 20 segundos
 - **Limitações:**
   - Formatação complexa pode afectar a extração
   - Tabelas são ignoradas
@@ -82,7 +73,6 @@ Esta seção permite importar as disciplinas do histórico do aluno através de 
 
 #### 2.2.4 Digitação Manual
 - **Uso recomendado:** Quando os métodos acima falham ou para adicionar disciplinas específicas
-- **Vantagem:** Não depende de processamento, sempre funciona
 - **Como usar:**
   1. Selecione a aba "Manual"
   2. Digite o nome da disciplina
@@ -90,37 +80,7 @@ Esta seção permite importar as disciplinas do histórico do aluno através de 
   4. Clique em "Adicionar"
   5. Repita para todas as disciplinas
 
-### 2.3 Indicador de Progresso
-
-Durante o processamento de arquivos, o sistema exibe:
-
-- **Barra de progresso:** Visual showing advancement
-- **Fase atual:** Indica o que está sendo feito
-- **Tempo estimado:** Previsão baseada no tipo/tamanho do arquivo
-- **Tempo decorrido:** Contador em tempo real
-
-**Fases do processo:**
-1. Inicializando (0-10%)
-2. Carregando arquivo (10-30%)
-3. Processando texto (30-70%) - OCR ou extração
-4. Analisando disciplinas (70-85%)
-5. Comparando com curso (85-95%)
-6. Concluído (95-100%)
-
-#### 2.3.1 Timeout (Tempo Limite Excedido)
-
-Se o processamento demorar mais que o limite, o sistema para automaticamente e mostra mensagem de erro com alternativas:
-
-- **Imagem:** 45 segundos
-- **PDF:** 30 segundos
-- **Word:** 20 segundos
-
-**Se aparecer mensagem de timeout:**
-- Use a digitação manual
-- Tente um arquivo menor
-- Use um dispositivo com mais recursos (PC ao invés de mobile)
-
-### 2.4 Curso
+### 2.3 Curso
 
 Permite selecionar o curso de destino. Atualmente disponível:
 - **Técnico em Enfermagem** - Curso padrão do sistema
@@ -300,29 +260,8 @@ O sistema salva automaticamente os atendimentos no localStorage do navegador.
 - **Solução:** Limpe dados de navegação ou use outro navegador
 
 ### 8.4 PDF não gera
-
 - **Causa:** Biblioteca jsPDF não carregou
 - **Solução:** Use a opção "Imprimir / Salvar PDF" como alternativa
-
-### 8.5 Tempo limite excedido (Timeout)
-
-- **Causa:** Arquivo muito grande ou dispositivo lento
-- **Sintomas:** Barra de progresso parada por mais de 45 segundos
-- **Soluções:**
-  1. Use a aba "Manual" para digitar as disciplinas
-  2. Tente um arquivo menor (reduza o tamanho da imagem/PDF)
-  3. Para PDFs scaneados, use a opção de Imagem com foto melhor
-  4. Use um dispositivo com mais recursos (PC ao invés de mobile)
-
-### 8.6 Sistema não consegue processar documento
-
-- **Causa:** Documento em formato não suportado ou muito complexo
-- **Sintomas:** Mensagem "O sistema não conseguiu processar o documento"
-- **Soluções:**
-  1. Verifique se o arquivo não está corrompido
-  2. Para PDFs, tente salvar com texto selecionável
-  3. Use a digitação manual como fallback
-  4. Tire uma foto melhor do histórico
 
 ---
 
@@ -330,4 +269,4 @@ O sistema salva automaticamente os atendimentos no localStorage do navegador.
 
 Para dúvidas ou problemas, contacte a equipe de desenvolvimento.
 
-**Versão do documento:** 2.1
+**Versão do documento:** 2.0
